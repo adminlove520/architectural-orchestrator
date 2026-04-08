@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.3.0] - 2026-04-08
+
+### ✨ 架构级功能 (Architectural Powerups)
+- **Scaffolding**: 新增 `orchestrate create <type> <name>` 命令，支持快速生成插件化的 `monitor`, `notifier`, `processor` 脚手架。
+- **Context Management**: 新增 `orchestrate summarize <dir>` 命令，用于压缩子代理的交付上下文，有效解决主进程 Token 溢出问题。
+- **Compliance Check**: 新增 `orchestrate check` 命令，强制执行协议合规性检查（如：是否存在 Discovery Report、架构状态文件等）。
+- **State Persistence**: 引入 `archive/architecture_state.json` 记录全局架构阶段。
+
+### 🏗️ 协议加固 (Protocol Hardening)
+- **强制动作**: 在 Phase 3 中增加了对 `SUMMARY.json` 的强制要求。
+- **I/O 契约**: 明确了子代理必须产出物理报告的义务。
+
+## [1.2.0] - 2026-04-08
+
+### 🩹 修复与优化 (Fixes & Refinement)
+- **Decision Matrix**: 引入了任务复杂性评分矩阵 (Scoring Matrix)。
+- **Operational Protocol**: 将 SKILL.md 从“散文”改造成“指令集”。
+
 ## [1.1.2] - 2026-04-08
 
 ### 🩹 修复与优化 (Fixes & Refinement)
