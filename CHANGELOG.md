@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.1] - 2026-04-08
+
+### 🩹 修复与微调 (Fixes & Tweak)
+- 修正了由于版本号一致导致的 GitHub Actions 发布异常。
+- 完善了帝国治理协议的部分文档表述。
+
 ## [1.6.0] - 2026-04-08
 
 ### 🛡️ 帝国治理引擎 (Imperial Governance Engine)
