@@ -1,57 +1,50 @@
-# Skill: Unified Orchestrator v1.4.0 (Governance Edition)
+# Skill: Unified Orchestrator v1.6.0 (Imperial Governance & Veto Engine)
 
 ## 🎯 核心定位
-本协议旨在解决大模型处理复杂任务时的“上下文溢出”和“逻辑漂移”问题。它将 Agent 从“对话者”提升为“编排者”，通过物理层面的任务隔离、状态持久化、架构决策审计 (ADR) 和验证门禁 (Verification Gate)，确保大型工程的治理水平和最终交付质量。
+本协议是基于“分权制衡”与“架构透明”理念构建的 Agent 运行引擎。它借鉴了“三省六部”制度，通过引入 **封驳权 (Veto)**、**奏折系统 (Memorials)** 和 **L1 层记忆分层**，确保复杂任务的执行不再是“黑盒”，而是具备高度可审计性和可干预性的治理过程。
 
-## 🚦 决策逻辑 (Scoring Matrix)
-*当满足以下任一条件或总评分 ≥ 6 时，必须启动此协议：*
-- **Volume**: 阅读 >500 行代码或跨越 >3 个功能模块。
-- **Steps**: 执行路径超过 5 个原子步骤。
-- **Uncertainty**: 涉及调研、选型或不确定的 API。
-- **Risk**: 涉及核心数据结构、物理环境变更或第三方集成。
+## 🚦 执行模式 (Regime Matrix)
+*启动 `orchestrate score` 自动评估，强制应用以下治理模式：*
 
-## 🏛️ 管理与治理协议 (Governance Protocols)
+| 模式 | 评分 | 核心逻辑 | 治理要求 |
+| :--- | :--- | :--- | :--- |
+| **⚡ 现代模式 (Flat)** | < 6 | 快速迭代，直接执行。 | 基础 `task_create` 即可。 |
+| **⚖️ 均衡模式 (Balanced)** | 6 - 9 | 规划 -> 审核 -> 派发 -> 验证。 | 必须产出 `Discovery Report`。 |
+| **🛡️ 严谨模式 (Strict)** | > 9 | 深度解构 -> 封驳审核 -> 风险对齐 -> 门禁。 | 全量 ADR、Risk Log、Veto Check。 |
 
-### 1. 架构决策审计 (ADR Protocol)
-**强制动作**: 当涉及重大技术选型（如：更换数据库、修改异步模型、引入新库）时，主进程必须运行 `orchestrate decide "Title"`。
-**验收标准**: `archive/adr/` 目录下必须存在对应的决策记录文档，解释“为什么”这样做。
+## 🏛️ 三省六部治理协议 (Imperial Protocols)
 
-### 2. 风险管理 (Risk Tracking Protocol)
-**强制动作**: 在 Discovery 阶段发现的任何潜在隐患，必须通过 `orchestrate risk "Issue"` 登记。
-**状态维护**: 关键任务完成前，必须核查关联风险是否已解决 (Status: CLOSED)。
+### Phase 1: Zhongshu (中书省 - 规划与调研)
+- **职责**: 深度调研目标项目，产出原子任务拆解方案。
+- **强制动作**: 生成 `archive/discovery_report.json`。
+- **关键输出**: 依赖矩阵图谱、风险点初步识别。
 
-### 3. 验证门禁 (Verification Gate Protocol)
-**强制动作**: 任何子代理交付的任务，在标记为 `COMPLETED` 前，主进程必须模拟或执行 `orchestrate gate taskId` 进行最终验收。
-**门禁标准**: 代码审计、单测覆盖、副作用检查、文档同步。
+### Phase 2: Menxia (门下省 - 审核与封驳)
+- **职责**: 质量把关。对中书省的方案进行“封驳”或“准奏”。
+- **封驳权 (Veto)**: 若方案模糊、风险未覆盖、逻辑不严密，必须运行 `orchestrate reject "Reason"`。
+- **强制要求**: 被封驳后，逻辑强制重置回 Phase 1 重新规划。
 
-## 🛠️ 分布式执行流 (Execution Flow)
+### Phase 3: Shangshu (尚书省 - 派发与汇总)
+- **职责**: 调度执行层（六部/子代理），管理上下文。
+- **执行准则**: 调度 `explore` (工部), `bash` (兵部), `general` (吏部)。
+- **L1 记忆压缩**: 子代理交付时强制运行 `orchestrate summarize [dir]`。主进程仅读取 `SUMMARY.json`。
 
-### Phase 1: Deep Discovery (由 explore 执行)
-**产出**: 必须生成 `archive/discovery_report.json`。
+### Phase 4: Memorial (回奏 - 阶段性结案)
+- **职责**: 每一阶段结束或重大任务完成，必须生成“奏折”。
+- **指令**: `orchestrate memorial`。
+- **内容**: 包含 `Thinking Trajectory` (思维轨迹) 和 `Refactoring Summary`。
 
-### Phase 2: Strategic Planning & Decision (由主进程执行)
-**动作**:
-1. 初始化 `task_create` 列表。
-2. 记录初始 ADR 决策。
-3. 建立 `archive/risk_log.json`。
-
-### Phase 3: Domain Execution (分布式协作)
-**动作**:
-- **Scaffolding**: 使用 `orchestrate create` 生成标准代码。
-- **Delivery**: 子代理由 `orchestrate summarize` 压缩上下文。
-
-### Phase 4: Gatekeeping & Final Merge (主进程执行)
-**动作**:
-1. 运行 `orchestrate gate` 进行物理验收。
-2. 运行 `orchestrate check` 检查协议合规性。
-3. 合并成果并更新 `architecture_state.json`。
+## 🧠 智慧模型 (Thinking Models)
+- **First Principles**: 回归物理逻辑，不被现有混乱代码带偏。
+- **MECE**: 任务拆解相互独立，完全穷尽。
+- **Veto Logic**: 封驳不是为了阻碍，而是为了确保方向的绝对正确。
 
 ## ⚠️ 禁忌与红线 (Red Lines)
-- **禁止秘密决策**: 重大架构变更必须记录 ADR。
 - **禁止单点读写**: 严禁在主对话窗口直接修改核心业务代码。
-- **禁止跳过验收**: 严禁在未经 `gate` 检查的情况下标记任务完成。
+- **禁止跨级执行**: 严禁在未经门下省审核的情况下直接进行 Shangshu 派发。
+- **禁止思维黑盒**: 所有重大的“为什么”必须记录在 ADR 或奏折中。
 
-## 📦 工具链
-- `task_*`: 状态持久化看板。
-- `sessions_*`: 分布式调度。
-- `orchestrate CLI`: 治理实施、ADR 记录、风险登记、验收门禁、上下文压缩。
+## 📦 工具链集成
+- `task_*`: 任务看板持久化。
+- `sessions_*`: 分布式算力调度。
+- `orchestrate CLI`: 治理实施、封驳操作、奏折生成、上下文压缩。
