@@ -1,46 +1,42 @@
-# Skill: Unified Orchestrator (Architectural Orchestrator)
+# Skill: Unified Orchestrator v1.2.0 (Operational Protocol)
 
-## Overview
-这个 Skill 赋予 Agent 处理任何复杂、多阶段、高不确定性任务的能力。它不仅限于编程 (Coding)，而是通过标准化的“信息解构”、“战略规划”和“分布式执行”流程，确保任何复杂问题的解决都具备架构级的严谨性和闭环性。
+## 🎯 核心定位
+本协议旨在解决大模型处理复杂任务时的“上下文溢出”和“逻辑漂移”问题。它将 Agent 从“对话者”提升为“编排者”，通过物理层面的任务隔离和状态持久化，确保大型工程的可预测性。
 
-## Trigger Keywords
-- 重构 / Refactor
-- 复杂任务 / Complex Task
-- 深度研究 / Deep Research
-- 多阶段规划 / Multi-stage Planning
-- 架构设计 / Architecture Design
-- 自动化流程 / Automation Flow
-- 项目管理 / Project Management
+## 🚦 决策逻辑 (Scoring Matrix)
+*当满足以下任一条件或总评分 ≥ 6 时，必须启动此协议：*
+- **Volume**: 需要阅读 >500 行代码或跨越 >3 个功能模块。
+- **Steps**: 预估执行路径超过 5 个原子步骤。
+- **Uncertainty**: 涉及未使用的 API 或需要进行技术调研。
 
-## Core Workflow (通用架构化流程)
+## 🛠️ 阶段性指令集 (Agent-to-Agent Protocols)
 
-### Phase 1: Deep Discovery & Scoping (深度探索与范围界定)
-1. **全景调研**: 根据任务类型（代码、市场、技术、文档），调度 `explore` 或 `browser` 代理收集全量背景数据。
-2. **逻辑解构**: 从海量原始信息中提取核心要素，明确输入 (Input)、约束 (Constraints) 和交付物标准 (Definition of Done)。
+### Phase 1: Deep Discovery (由 explore 代理执行)
+**指令规范**: `sessions_spawn(agent_id="explore", task="SCAN: [target]. OUTPUT: {dependencies: [], entry_points: [], side_effects: []}")`
+**验收标准**: 必须生成一个 `archive/discovery_report.json` 文件，禁止口头汇报。
 
-### Phase 2: Strategic Tasking & Dependency Mapping (战略分工与依赖建模)
-1. **看板建立**: 调用 `task_create` 初始化任务看板，赋予任务持久化状态。
-2. **原子化拆解**: 将复杂大目标拆解为“单次交互可闭环”的原子任务。每个任务必须有明确的验收标准。
-3. **依赖建模**: 使用 `addBlockedBy` 建立任务间的拓扑逻辑，识别关键路径 (Critical Path)。
+### Phase 2: Strategic Tasking (由主进程执行)
+**指令规范**: 
+1. 建立 `task_create` 列表。
+2. 每个 Task 必须包含 `Acceptance Criteria` (验收准则)。
+3. 使用 `addBlockedBy` 标记依赖。
 
-### Phase 3: Domain-Specific Execution (分布式领域执行)
-精准调度不同能力的 Sub-agents：
-- **`explore`**: 负责静态资源（代码、本地文件、日志）的深度分析。
-- **`browser`**: 负责动态信息（网页实时数据、API 调试、三方服务验证）。
-- **`bash`**: 负责环境构建、脚本执行、物理操作、自动化测试。
-- **`general`**: 负责逻辑综合、长文撰写、模块开发。
+### Phase 3: Distributed Execution (领域代理协作)
+- **`explore`**: 仅限审计与分析。
+- **`bash`**: 仅限物理操作、构建与测试。
+- **`general`**: 负责核心逻辑重写。
+- **上下文管理**: 子代理写入 `delivery_path`，主进程仅读取其 `README.md` 摘要，而非全量内容。
 
-### Phase 4: Synthesis & Cross-Verification (综合汇总与交叉验证)
-1. **结果归集**: 从 `delivery_path` 收集所有分布式产出，进行逻辑对齐。
-2. **闭环验证**: 通过子代理或自动化脚本进行最终验收，确保所有原子任务的合集满足最初的交付标准。
-3. **交付报告**: 生成最终的执行摘要，确认所有 Task 的完成状态。
+### Phase 4: Synthesis & Verification (由 bash/general 协作)
+- 强制执行 `orchestrate verify` 命令（如果存在）。
+- 最终产出必须包含：`Refactoring Summary` + `Test Pass Log` + `Post-check diff`。
 
-## Best Practices
-- **上下文防污染**: 严禁在主进程中直接处理超过 1000 行的原始数据。必须委派子代理进行预处理。
-- **原子性原则**: 每一个 Task 的描述必须清晰到“足以让一个零背景的子代理独立完成”。
-- **并行最大化**: 只要没有依赖关系，必须在同一个 Turn 中并行启动所有子代理。
+## ⚠️ 禁忌与红线 (Red Lines)
+- **禁止单点读写**: 严禁在主对话窗口直接修改核心业务代码。
+- **禁止口头完成**: 任何 Task 的状态更新必须伴随物理文件的变更或测试日志。
+- **禁止并行超限**: 最大并发 Session 限制为 5 个。
 
-## Tools Used
-- `task_create / task_update / task_list`
-- `sessions_spawn / sessions_send / sessions_history`
-- `glob / grep / read / web_search / web_fetch`
+## 📦 工具链集成
+- `task_*`: 状态持久化看板。
+- `sessions_*`: 分布式算力调度。
+- `orchestrate CLI`: 物理环境初始化。
