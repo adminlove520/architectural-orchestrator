@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.2] - 2026-04-08
+
+### 🩹 修复与优化 (Fixes & Refinement)
+- 修正了版本一致性问题。
+- 完善了 GitHub Actions 自动化发布流程。
+
 ## [1.1.1] - 2026-04-08
 
 ### 🩹 修复与优化 (Fixes & Refinement)
