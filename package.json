@@ -3,6 +3,15 @@
   "version": "1.1.0",
   "description": "A universal architectural task management framework for AI agents.",
   "main": "index.js",
+  "files": [
+    "bin/",
+    "SKILL.md",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "bin": {
     "orchestrate": "./bin/orchestrate.js"
   },
