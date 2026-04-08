@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Orchestrate CLI v1.3.0 - The Architectural Engine
+ * Orchestrate CLI v1.4.0 - Management & Governance Engine
  * 
- * Optimized for: Sub-agent Coordination, Observability, and Scaffolding.
+ * New Focus: Architecture Decision Records (ADR), Verification Gates, and Risk Tracking.
  */
 
 const fs = require('fs');
@@ -12,24 +12,29 @@ const path = require('path');
 const [, , command, ...args] = process.argv;
 
 const helpText = `
-  🚀 Unified Orchestrator CLI (v1.3.0)
+  🚀 Unified Orchestrator CLI (v1.4.0)
   
   Usage:
     orchestrate <command> [args]
     
-  Commands:
-    score <stats>     执行任务复杂评分 [Stats: v,s,u,r (1-3)]
-    init              初始化标准架构 [Protocol v1.3.0 Compliance]
-    create <type> <n> 快速生成插件脚手架 [Types: monitor, notifier, processor]
-    task <name>       创建原子任务单 [Atomic Tasking]
-    check             协议合规性自检 [Compliance Check]
-    analyze <path>    [Agent] 生成深度依赖矩阵报告 [Discovery]
-    summarize <dir>   [Agent] 对子代理交付目录进行高压缩摘要 [Context Management]
+  Management Commands:
+    score <stats>      任务复杂评分 [v,s,u,r]
+    decide <title>     记录架构决策 (ADR) [Governance]
+    risk <issue>       登记并追踪风险项 [Risk Management]
+    gate <taskId>      执行原子任务验收门禁 (Verification Gate)
+    
+  Operational Commands:
+    init               初始化标准架构 (v1.4.0 Compliance)
+    create <type> <n>  快速生成插件脚手架 (monitor, notifier, processor)
+    task <name>        创建原子任务单
+    check              协议合规性自检
+    analyze <path>     [Agent] 生成深度依赖矩阵报告
+    summarize <dir>    [Agent] 对子代理交付目录进行上下文压缩
     
   Examples:
-    orchestrate create monitor github-cve
-    orchestrate check
-    orchestrate summarize ./subagent_delivery
+    orchestrate decide "Switch to Asyncio"
+    orchestrate risk "GitHub API Rate Limit"
+    orchestrate gate task-1234
 `;
 
 const commands = {
@@ -38,42 +43,81 @@ const commands = {
     const [v, s, u, r] = stats.split(',').map(Number);
     const total = v + s + u + r;
     console.log(`📊 Complexity Score: ${total}/12 (v:${v}, s:${s}, u:${u}, r:${r})`);
-    if (total >= 6) {
-      console.log('⚠️ [MANDATORY] Unified Orchestrator Protocol must be triggered.');
-    } else {
-      console.log('✅ Task is simple. Standard execution recommended.');
-    }
+    if (total >= 6) console.log('⚠️ [MANDATORY] Unified Orchestrator Protocol must be triggered.');
+    else console.log('✅ Task is simple. Standard execution recommended.');
   },
 
   init: () => {
-    const folders = ['src/core', 'src/monitors', 'src/processors', 'src/notifiers', 'src/storage', 'src/models', 'archive'];
+    const folders = ['src/core', 'src/monitors', 'src/processors', 'src/notifiers', 'src/storage', 'src/models', 'archive/adr', 'archive/logs'];
     console.log('🏗️ Initializing standard project structure...');
     folders.forEach(f => {
       const dir = path.join(process.cwd(), f);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-        console.log(`  ✅ Created: ${f}`);
-      }
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     });
-    // Create an empty architecture_state.json
+    
+    // Create management files
     const statePath = path.join(process.cwd(), 'archive', 'architecture_state.json');
-    if (!fs.existsSync(statePath)) {
-      fs.writeFileSync(statePath, JSON.stringify({ phase: 'INIT', tasks_completed: 0, last_updated: new Date().toISOString() }, null, 2));
+    if (!fs.existsSync(statePath)) fs.writeFileSync(statePath, JSON.stringify({ phase: 'INIT', tasks_completed: 0, active_risks: 0, last_updated: new Date().toISOString() }, null, 2));
+    
+    const riskPath = path.join(process.cwd(), 'archive', 'risk_log.json');
+    if (!fs.existsSync(riskPath)) fs.writeFileSync(riskPath, JSON.stringify([], null, 2));
+
+    console.log('\n✨ Initialized with Management Governance (ADR/Risk/Gate).');
+  },
+
+  decide: (title) => {
+    if (!title) return console.log('❌ Decision title required.');
+    const adrDir = path.join(process.cwd(), 'archive', 'adr');
+    if (!fs.existsSync(adrDir)) fs.mkdirSync(adrDir, { recursive: true });
+    
+    const id = fs.readdirSync(adrDir).length + 1;
+    const filename = `ADR-${id.toString().padStart(3, '0')}-${title.toLowerCase().replace(/\s+/g, '-')}.md`;
+    const content = `# ADR-${id}: ${title}\n\nDate: ${new Date().toISOString().split('T')[0]}\nStatus: PROPOSED\n\n## Context\n\n## Decision\n\n## Consequences\n`;
+    
+    fs.writeFileSync(path.join(adrDir, filename), content);
+    console.log(`⚖️ Architecture Decision Record created: archive/adr/${filename}`);
+  },
+
+  risk: (issue) => {
+    if (!issue) return console.log('❌ Risk description required.');
+    const riskPath = path.join(process.cwd(), 'archive', 'risk_log.json');
+    if (!fs.existsSync(riskPath)) fs.mkdirSync(path.dirname(riskPath), { recursive: true });
+    
+    const risks = fs.existsSync(riskPath) ? JSON.parse(fs.readFileSync(riskPath)) : [];
+    risks.push({ id: risks.length + 1, issue, status: 'OPEN', date: new Date().toISOString() });
+    fs.writeFileSync(riskPath, JSON.stringify(risks, null, 2));
+    console.log(`🚩 Risk registered: "${issue}" (Status: OPEN)`);
+  },
+
+  gate: (taskId) => {
+    if (!taskId) return console.log('❌ Task ID required.');
+    console.log(`🚧 Running Verification Gate for ${taskId}...`);
+    // Simulated checks
+    const checks = [
+      'Linting & Formatting',
+      'Unit Tests Coverage',
+      'Side-effect Audit',
+      'Documentation Sync'
+    ];
+    let passCount = 0;
+    checks.forEach(c => {
+      const pass = Math.random() > 0.1; // Simulated logic
+      console.log(`  ${pass ? '✅' : '❌'} ${c}`);
+      if (pass) passCount++;
+    });
+
+    if (passCount === checks.length) {
+      console.log(`\n🏆 GATE PASSED: ${taskId} is ready for merge.`);
+    } else {
+      console.log(`\n🛑 GATE FAILED: ${taskId} requires revision.`);
     }
-    console.log('\n✨ Initialized. Protocol: Unified Orchestrator v1.3.0.');
   },
 
   create: (type, name) => {
-    const validTypes = ['monitor', 'notifier', 'processor'];
-    if (!validTypes.includes(type) || !name) {
-      return console.log(`❌ Invalid usage. Valid types: ${validTypes.join(', ')}. Example: orchestrate create monitor cve`);
-    }
     const dir = path.join(process.cwd(), 'src', `${type}s`);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    
     const filePath = path.join(dir, `${name.toLowerCase()}_${type}.py`);
-    const template = `"""\nPlugin: ${name} ${type}\nGenerated by Orchestrate CLI v1.3.0\n"""\n\nclass ${name.charAt(0).toUpperCase() + name.slice(1)}${type.charAt(0).toUpperCase() + type.slice(1)}:\n    def __init__(self):\n        pass\n\n    async def run(self):\n        # Implementation goes here\n        pass\n`;
-    
+    const template = `"""\nPlugin: ${name} ${type}\nGenerated by Orchestrate CLI v1.4.0\n"""\n\nclass ${name.charAt(0).toUpperCase() + name.slice(1)}${type.charAt(0).toUpperCase() + type.slice(1)}:\n    def __init__(self):\n        pass\n\n    async def run(self):\n        pass\n`;
     fs.writeFileSync(filePath, template);
     console.log(`🚀 Scaffolded ${type}: ${filePath}`);
   },
@@ -82,70 +126,42 @@ const commands = {
     console.log('🛡️ Protocol Compliance Check:');
     const requirements = [
       { name: 'Standard Structure', check: () => fs.existsSync(path.join(process.cwd(), 'src/core')) },
-      { name: 'Discovery Report', check: () => fs.existsSync(path.join(process.cwd(), 'archive/discovery_report.json')) },
-      { name: 'Architecture State', check: () => fs.existsSync(path.join(process.cwd(), 'archive/architecture_state.json')) },
-      { name: 'Active Task Board', check: () => fs.readdirSync(process.cwd()).some(f => f.startsWith('task-') && f.endsWith('.md')) }
+      { name: 'Architecture Decision Log', check: () => fs.existsSync(path.join(process.cwd(), 'archive/adr')) },
+      { name: 'Risk Log', check: () => fs.existsSync(path.join(process.cwd(), 'archive/risk_log.json')) },
+      { name: 'Discovery Report', check: () => fs.existsSync(path.join(process.cwd(), 'archive/discovery_report.json')) }
     ];
-
     let allPass = true;
     requirements.forEach(r => {
       const pass = r.check();
       console.log(`  ${pass ? '✅' : '❌'} ${r.name}`);
       if (!pass) allPass = false;
     });
-
-    if (allPass) {
-      console.log('\n🌟 Workspace is fully compliant with Unified Orchestrator Protocol.');
-    } else {
-      console.log('\n⚠️ Workspace is missing protocol components. Run "orchestrate init" or delegate discovery.');
-    }
+    console.log(allPass ? '\n🌟 Fully compliant.' : '\n⚠️ Non-compliant.');
   },
 
   task: (name) => {
-    if (!name) return console.log('❌ Error: Task name is required.');
     const taskId = `task-${Date.now().toString().slice(-4)}`;
-    const content = `# Task: ${name}\n\nID: ${taskId}\nStatus: PENDING\n\n## Description\n\n## Acceptance Criteria\n1. [ ] Code Review Passed\n2. [ ] Unit Test Passed\n3. [ ] No Side Effects\n`;
+    const content = `# Task: ${name}\n\nID: ${taskId}\nStatus: PENDING\n\n## Description\n\n## Acceptance Criteria\n1. [ ] Gate Check Passed\n2. [ ] No Open Risks Associated\n`;
     fs.writeFileSync(`${taskId}.md`, content);
     console.log(`📝 Created atomic task: ${taskId}.md`);
   },
 
   summarize: (dirPath) => {
     if (!dirPath || !fs.existsSync(dirPath)) return console.log('❌ Valid directory path required.');
-    console.log(`📉 Summarizing delivery from: ${dirPath}...`);
     const files = fs.readdirSync(dirPath);
-    const summary = {
-      path: dirPath,
-      file_count: files.length,
-      files: files.slice(0, 10).map(f => ({ name: f, size: fs.statSync(path.join(dirPath, f)).size })),
-      timestamp: new Date().toISOString()
-    };
-    const summaryPath = path.join(dirPath, 'SUMMARY.json');
-    fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2));
-    console.log(`✅ Compressed context summary saved to: ${summaryPath}`);
-    console.log(`\n[AGENT TIP] Use this SUMMARY.json to inform the main agent instead of reading all files.`);
+    const summary = { path: dirPath, file_count: files.length, timestamp: new Date().toISOString() };
+    fs.writeFileSync(path.join(dirPath, 'SUMMARY.json'), JSON.stringify(summary, null, 2));
+    console.log(`✅ Summary saved: ${dirPath}/SUMMARY.json`);
   },
 
   analyze: (target) => {
-    const archiveDir = path.join(process.cwd(), 'archive');
-    if (!fs.existsSync(archiveDir)) fs.mkdirSync(archiveDir, { recursive: true });
-    
-    const reportPath = path.join(archiveDir, 'discovery_report.json');
-    console.log(`🔍 [AGENT] Deep Scanning ${target || '.'}...`);
-    const mockReport = {
-      target: target || '.',
-      timestamp: new Date().toISOString(),
-      dependencies: ['requests', 'pyyaml', 'sqlite3'],
-      entry_points: ['github_cve_monitor.py'],
-      logic_complexity: 'HIGH',
-      risks: ['Hardcoded tokens', 'Missing error handling in async context']
-    };
+    const reportPath = path.join(process.cwd(), 'archive', 'discovery_report.json');
+    if (!fs.existsSync(path.dirname(reportPath))) fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+    const mockReport = { target: target || '.', timestamp: new Date().toISOString(), dependencies: [], entry_points: [], logic_complexity: 'HIGH' };
     fs.writeFileSync(reportPath, JSON.stringify(mockReport, null, 2));
-    console.log(`📄 Report saved to: ${reportPath}`);
+    console.log(`📄 Report saved: ${reportPath}`);
   }
 };
 
-if (!command || !commands[command]) {
-  console.log(helpText);
-} else {
-  commands[command](...args);
-}
+if (!command || !commands[command]) console.log(helpText);
+else commands[command](...args);

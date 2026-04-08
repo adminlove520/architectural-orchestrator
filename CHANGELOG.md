@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0] - 2026-04-08
+
+### ✨ 管理与治理增强 (Management & Governance)
+- **ADR (Architecture Decision Records)**: 新增 `orchestrate decide <title>` 命令。强制记录重大技术选型及其背景（在 `archive/adr/` 目录下）。
+- **Verification Gate (验收门禁)**: 新增 `orchestrate gate <taskId>` 命令。任务完成前必须通过自动化/模拟的验收门禁（涵盖 Linting, Tests, Side-effects）。
+- **Risk Management (风险管理)**: 新增 `orchestrate risk <issue>` 命令。支持登记并追踪项目中的技术/业务风险（在 `archive/risk_log.json` 中）。
+- **Governance Scaffolding**: `orchestrate init` 现在会自动初始化 ADR 目录、日志目录和风险日志文件。
+
+### 🏗️ 协议加固 (Protocol Hardening)
+- **强制动作**: 在重构过程中，凡涉及重大变更必须记录 ADR。
+- **验收准则**: 任务看板中的原子任务现在必须关联“Gate Check”通过状态。
+
 ## [1.3.0] - 2026-04-08
 
 ### ✨ 架构级功能 (Architectural Powerups)
